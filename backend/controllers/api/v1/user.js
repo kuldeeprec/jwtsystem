@@ -1,47 +1,37 @@
 const User = require("../../../models/user");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-module.exports.create = function (req, res) {
-  if (req.body.password != req.body.confirm_password) {
-    return res.json(422, {
-      message: "Invalid password",
+module.exports.create = async function (req, res) {
+  try {
+    if (req.body.password != req.body.confirm_password) {
+      return res.json(401, {
+        message: "Invalid password",
+      });
+    }
+    let user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      let user = await User.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPassword,
+      });
+      if (user) {
+        return res.json(200, {
+          message: "succesfully log in",
+        });
+      }
+    }
+    return res.json(401, {
+      message: "user already exists",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.json(500, {
+      message: `${err}`,
     });
   }
-
-  User.findOne({ email: req.body.email }, function (err, user) {
-    if (err) {
-      return res.json(422, {
-        message: "uable to find",
-      });
-    }
-
-    if (!user) {
-      // console.log(req.body.name, req.body.email, req.body.password);
-      const salt = bcrypt.genSalt(10);
-      const hashedPassword = bcrypt.hash(req.body.password, 10);
-      User.create(
-        {
-          name: req.body.name,
-          email: req.body.email,
-          password: hashedPassword,
-        },
-        function (err, user) {
-          if (err) {
-            return res.json(422, {
-              message: "unable to create",
-            });
-          }
-          return res.json(422, {
-            message: "succesfully log in",
-          });
-        }
-      );
-    } else {
-      return res.json(422, {
-        message: "Invalid username or password",
-      });
-    }
-  });
 };
 
 module.exports.createSession = async function (req, res) {
@@ -68,4 +58,8 @@ module.exports.createSession = async function (req, res) {
       message: "Internal Server Error",
     });
   }
+};
+
+module.exports.userinfo = function (req, res) {
+  res.send("Hello kuldeep");
 };

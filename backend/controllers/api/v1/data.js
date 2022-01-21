@@ -6,3 +6,23 @@ module.exports.index = async function (req, res) {
     data: data,
   });
 };
+module.exports.create = async function (req, res) {
+  try {
+    let data = await Data.create({
+      content: req.body.content,
+    });
+    if (data) {
+      return res.json(200, {
+        message: "succesfully inseted data",
+      });
+    }
+    return res.json(200, {
+      message: "not inserted",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.json(500, {
+      message: `${err}`,
+    });
+  }
+};
