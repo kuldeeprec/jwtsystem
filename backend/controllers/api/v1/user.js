@@ -19,7 +19,7 @@ module.exports.create = async function (req, res) {
       });
       if (user) {
         return res.json(200, {
-          message: "succesfully log in",
+          message: "succesfully sign up",
         });
       }
     }
