@@ -46,12 +46,20 @@ module.exports.createSession = async function (req, res) {
         message: "Invalid username or password",
       });
     }
-    return res.json(200, {
-      message: "Sign in successful, here is your token, please keep it safe!",
-      data: {
-        token: jwt.sign(user.toJSON(), "kuldeep", { expiresIn: "100000" }),
-      },
-    });
+    // return res.json(200, {
+    //   message: "Sign in successful, here is your token, please keep it safe!",
+    //   data: {
+    //     token: jwt.sign(user.toJSON(), "kuldeep", { expiresIn: "100000" }),
+    //   },
+    // });
+    var options = {
+      expires: new Date(Date.now() + 1000000),
+      httpOnly: true,
+      sameSite: "strict",
+    };
+    const token = jwt.sign(user.toJSON(), "kuldeep", { expiresIn: "1000000" });
+    res.cookie("jwt", token, options);
+    return res.send("succes fully login");
   } catch (err) {
     console.log("********", err);
     return res.json(500, {

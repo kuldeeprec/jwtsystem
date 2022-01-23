@@ -2,8 +2,16 @@ const passport = require("passport");
 const JWTStrategy = require("passport-jwt").Strategy;
 const ExtractJWT = require("passport-jwt").ExtractJwt;
 const User = require("../models/user");
+var cookieExtractor = function (req) {
+  var token = null;
+  if (req && req.cookies) {
+    token = req.cookies["jwt"];
+  }
+  return token;
+};
 let opts = {
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  // jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: cookieExtractor,
   secretOrKey: "kuldeep",
 };
 
@@ -23,5 +31,4 @@ passport.use(
     });
   })
 );
-
 module.exports = passport;
